@@ -12,7 +12,6 @@ var uvindex = document.querySelector("#uvindex")
 var localSaveEl = document.querySelector("#pre-results")
 
 var recentSearches = [];
-var alreadySearched = [];
 
 var getCityOneCall = function(lat, lon) {
     // Format API into a variable
@@ -94,6 +93,15 @@ var displayCity = function(data) {
     // display UV Index
     uvindex.textContent = "UV Index: " + data.current.uvi
 
+    // uv index
+    if (data.current.uvi <= 3){
+        uvindex.classList = ("low")
+    } else if (data.current.uvi >= 4 && data.current.uvi <= 7) {
+        uvindex.classList = ("med")
+    } else {
+        uvindex.classList = ("high")
+    };
+
     displayFiveDay(data);
 }
 
@@ -104,18 +112,20 @@ var displayFiveDay = function(data) {
 
     for (var i = 0; i < 6; i++){
 
+        var today = new Date()
+
         //create future cards
         var createDay = document.createElement("div");
         createDay.classList = "col-2 border justify-content-end"
 
         // All Elements
-        var createDate = document.createElement("h4");
+        var createDate = document.createElement("h5");
         var createIcon = document.createElement("img");
         var createTemp = document.createElement("p");
         var createWindSpeed = document.createElement("p");
         var createHumid = document.createElement("p");
 
-        createDate.innerHTML = "Fun o clock"
+        createDate.innerHTML = (today.getMonth()+1)+'/'+(today.getDate()+1+i)+'/'+today.getFullYear();
         createIcon.src = "http://openweathermap.org/img/wn/"+data.current.weather[0].icon+"@2x.png"
         createTemp.innerHTML = "Temp: " + data.daily[i].temp.day
         createWindSpeed.innerHTML = "Wind: " + data.daily[i].wind_speed + " MPH"
@@ -138,37 +148,44 @@ var parseLocalSave = function() {
     var cityLength = JSON.parse(localStorage.getItem("city"))
 
     for (var i = 0; i < cityLength.length; i++) {
-        for (var j = 0; j <= alreadySearched.length; j++) {
-            if (cityLength[i] !== alreadySearched[j]) {
-                displayLocalSave[cityLength[i]]
-            }
-        }
+        displayLocalSave(cityLength[i])
     }
 
 };
 
 var displayLocalSave = function(city) {
-
-    alreadySearched.push(city)
-
     var createButtons = document.createElement("button")
     createButtons.classList = "mb-3 btn btn-primary btn-lg"
+    createButtons.setAttribute("type", "submit");
+    createButtons.setAttribute("id", "recent-searches-btn")
     createButtons.innerHTML = city
 
     localSaveEl.appendChild(createButtons);
+
+    createButtons.addEventListener("click", function() {
+        getCity(city)
+    })
 }
 
 var saveSearch = function(cityName) {
 
+    // display recently searched items without having to reparse local storage
+    displayLocalSave(cityName);
+
+    // add new city search array of searched objects
     recentSearches.push(cityName);
 
     localStorage.setItem('city', JSON.stringify(recentSearches));
 
 }
 
+
+
 // Run JavaScript with basic city of NY
-parseLocalSave();
 getCity("New York");
+parseLocalSave();
+
+var recentSearchesEl = document.getElementById("recent-searches-btn")
 
 // Click Events
 cityForm.addEventListener("submit", formSubmitHandler)

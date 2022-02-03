@@ -6,3 +6,15 @@
 .col-2 {
     background-color: lightblue;
 }
+
+.low {
+    background-color: green;
+}
+
+.med {
+    background-color: yellow;
+}
+
+.high {
+    background-color: red;
+}
