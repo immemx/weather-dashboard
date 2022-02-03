@@ -9,6 +9,10 @@ var temp = document.querySelector("#temp")
 var wind = document.querySelector("#wind")
 var humid = document.querySelector("#humid")
 var uvindex = document.querySelector("#uvindex")
+var localSaveEl = document.querySelector("#pre-results")
+
+var recentSearches = [];
+var alreadySearched = [];
 
 var getCityOneCall = function(lat, lon) {
     // Format API into a variable
@@ -129,15 +133,42 @@ var displayFiveDay = function(data) {
     }
 }
 
-var displayLocalSave = function() {
+var parseLocalSave = function() {
+
+    var cityLength = JSON.parse(localStorage.getItem("city"))
+
+    for (var i = 0; i < cityLength.length; i++) {
+        for (var j = 0; j <= alreadySearched.length; j++) {
+            if (cityLength[i] !== alreadySearched[j]) {
+                displayLocalSave[cityLength[i]]
+            }
+        }
+    }
+
+};
+
+var displayLocalSave = function(city) {
+
+    alreadySearched.push(city)
+
+    var createButtons = document.createElement("button")
+    createButtons.classList = "mb-3 btn btn-primary btn-lg"
+    createButtons.innerHTML = city
+
+    localSaveEl.appendChild(createButtons);
 }
 
 var saveSearch = function(cityName) {
 
+    recentSearches.push(cityName);
+
+    localStorage.setItem('city', JSON.stringify(recentSearches));
+
 }
 
 // Run JavaScript with basic city of NY
-getCity("New York")
+parseLocalSave();
+getCity("New York");
 
 // Click Events
 cityForm.addEventListener("submit", formSubmitHandler)
